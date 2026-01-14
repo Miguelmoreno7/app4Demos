@@ -1,7 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import EditorPanel from "./components/EditorPanel";
 import PhonePreview from "./components/PhonePreview";
-import { loadState, saveState, type Message, type Profile } from "./utils/storage";
+import {
+  loadState,
+  saveState,
+  type AppState,
+  type Message,
+  type Profile,
+} from "./utils/storage";
 import { validateImportData } from "./utils/validators";
 
 const defaultProfile: Profile = {
@@ -15,18 +21,20 @@ const defaultMessages: Message[] = [
   { from: "agent", text: "Puedes controlar el replay con Play/Pause y ajustar la velocidad." },
 ];
 
+const exampleMessages = [
+  { from: "user", text: "Hola MovIA, ¿puedes mostrar un demo rápido?" },
+  { from: "agent", text: "¡Claro! Aquí tienes un flujo de chat animado." },
+  { from: "agent", text: "También puedo importar JSON y ajustar la velocidad." },
+  { from: "user", text: "Perfecto, gracias." },
+ ] satisfies Message[];
+
 const examplePayload = {
   profile: {
     name: "MovIA",
     avatarUrl: "https://i.pravatar.cc/150?img=68",
   },
-  messages: [
-    { from: "user", text: "Hola MovIA, ¿puedes mostrar un demo rápido?" },
-    { from: "agent", text: "¡Claro! Aquí tienes un flujo de chat animado." },
-    { from: "agent", text: "También puedo importar JSON y ajustar la velocidad." },
-    { from: "user", text: "Perfecto, gracias." },
-  ],
-};
+  messages: exampleMessages,
+} satisfies AppState;
 
 const App = () => {
   const savedState = useMemo(() => loadState(), []);
