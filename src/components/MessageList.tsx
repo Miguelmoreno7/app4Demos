@@ -6,6 +6,7 @@ type MessageListProps = {
   onAddMessage: (message: Message) => void;
   onDeleteMessage: (index: number) => void;
   onMoveMessage: (index: number, direction: "up" | "down") => void;
+  disabled?: boolean;
 };
 
 const MessageList = ({
@@ -13,6 +14,7 @@ const MessageList = ({
   onAddMessage,
   onDeleteMessage,
   onMoveMessage,
+  disabled = false,
 }: MessageListProps) => {
   const [from, setFrom] = useState<Message["from"]>("user");
   const [text, setText] = useState("");
@@ -33,7 +35,8 @@ const MessageList = ({
           <select
             value={from}
             onChange={(event) => setFrom(event.target.value as Message["from"])}
-            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+            disabled={disabled}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm disabled:cursor-not-allowed disabled:bg-slate-100"
           >
             <option value="user">User</option>
             <option value="agent">Agent</option>
@@ -41,7 +44,8 @@ const MessageList = ({
           <button
             type="button"
             onClick={handleAdd}
-            className="rounded-lg bg-emerald-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-emerald-600"
+            disabled={disabled}
+            className="rounded-lg bg-emerald-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Agregar
           </button>
@@ -50,7 +54,8 @@ const MessageList = ({
           value={text}
           onChange={(event) => setText(event.target.value)}
           rows={3}
-          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+          disabled={disabled}
+          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm disabled:cursor-not-allowed disabled:bg-slate-100"
           placeholder="Escribe el mensaje..."
         />
       </div>
@@ -81,7 +86,7 @@ const MessageList = ({
                     <button
                       type="button"
                       onClick={() => onMoveMessage(index, "up")}
-                      disabled={index === 0}
+                      disabled={disabled || index === 0}
                       className="rounded-lg border border-slate-200 px-2 py-1 text-xs text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       ↑
@@ -89,7 +94,7 @@ const MessageList = ({
                     <button
                       type="button"
                       onClick={() => onMoveMessage(index, "down")}
-                      disabled={index === messages.length - 1}
+                      disabled={disabled || index === messages.length - 1}
                       className="rounded-lg border border-slate-200 px-2 py-1 text-xs text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       ↓
@@ -97,7 +102,8 @@ const MessageList = ({
                     <button
                       type="button"
                       onClick={() => onDeleteMessage(index)}
-                      className="rounded-lg border border-rose-200 px-2 py-1 text-xs text-rose-600 transition hover:bg-rose-50"
+                      disabled={disabled}
+                      className="rounded-lg border border-rose-200 px-2 py-1 text-xs text-rose-600 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       Borrar
                     </button>

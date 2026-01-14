@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import EditorPanel from "./components/EditorPanel";
 import PhonePreview from "./components/PhonePreview";
+import usePhoneRecorder from "./hooks/usePhoneRecorder";
 import {
   loadState,
   saveState,
@@ -51,6 +52,7 @@ const App = () => {
   const [isScrollLocked, setIsScrollLocked] = useState(false);
   const lockTimerRef = useRef<number | null>(null);
   const HEADER_PX = 0;
+  const { isRecording, elapsedMs, startRecording, stopRecording } = usePhoneRecorder();
 
   useEffect(() => {
     saveState({ profile, messages });
@@ -107,6 +109,14 @@ const App = () => {
     }
     setIsScrollLocked(false);
   }, [isPlaying]);
+
+  useEffect(() => {
+    if (!isRecording) return;
+    if (!isPlaying || visibleCount >= messages.length) {
+      stopRecording();
+      setIsScrollLocked(false);
+    }
+  }, [isRecording, isPlaying, messages.length, stopRecording, visibleCount]);
 
   const centerPhoneOnScreen = (element: HTMLDivElement | null) => {
     if (!element) return;
@@ -210,6 +220,8 @@ const App = () => {
             messages={messages}
             visibleCount={visibleCount}
             isPlaying={isPlaying}
+            isRecording={isRecording}
+            elapsedMs={elapsedMs}
             speed={speed}
             importError={importError}
             onProfileChange={setProfile}
@@ -227,6 +239,29 @@ const App = () => {
               }, 200);
             }}
             onPause={() => {
+              setIsPlaying(false);
+              setIsScrollLocked(false);
+            }}
+            onRecord={() => {
+              centerPhoneOnScreen(phoneRef.current);
+              setVisibleCount(0);
+              setIsPlaying(true);
+              startRecording({
+                phoneEl: phoneRef.current,
+                onStop: () => {
+                  setIsPlaying(false);
+                  setIsScrollLocked(false);
+                },
+              });
+              if (lockTimerRef.current) {
+                window.clearTimeout(lockTimerRef.current);
+              }
+              lockTimerRef.current = window.setTimeout(() => {
+                setIsScrollLocked(true);
+              }, 200);
+            }}
+            onStopRecording={() => {
+              stopRecording();
               setIsPlaying(false);
               setIsScrollLocked(false);
             }}

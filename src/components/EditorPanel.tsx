@@ -8,6 +8,8 @@ type EditorPanelProps = {
   messages: Message[];
   visibleCount: number;
   isPlaying: boolean;
+  isRecording: boolean;
+  elapsedMs: number;
   speed: number;
   importError: string | null;
   onProfileChange: (profile: Profile) => void;
@@ -16,6 +18,8 @@ type EditorPanelProps = {
   onMoveMessage: (index: number, direction: "up" | "down") => void;
   onPlay: () => void;
   onPause: () => void;
+  onRecord: () => void;
+  onStopRecording: () => void;
   onReset: () => void;
   onNext: () => void;
   onPrev: () => void;
@@ -29,6 +33,8 @@ const EditorPanel = ({
   messages,
   visibleCount,
   isPlaying,
+  isRecording,
+  elapsedMs,
   speed,
   importError,
   onProfileChange,
@@ -37,6 +43,8 @@ const EditorPanel = ({
   onMoveMessage,
   onPlay,
   onPause,
+  onRecord,
+  onStopRecording,
   onReset,
   onNext,
   onPrev,
@@ -58,7 +66,8 @@ const EditorPanel = ({
               onChange={(event) =>
                 onProfileChange({ ...profile, name: event.target.value })
               }
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+              disabled={isRecording}
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm disabled:cursor-not-allowed disabled:bg-slate-100"
               placeholder="Nombre visible"
             />
           </div>
@@ -71,7 +80,8 @@ const EditorPanel = ({
               onChange={(event) =>
                 onProfileChange({ ...profile, avatarUrl: event.target.value })
               }
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
+              disabled={isRecording}
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm disabled:cursor-not-allowed disabled:bg-slate-100"
               placeholder="https://..."
             />
           </div>
@@ -86,6 +96,7 @@ const EditorPanel = ({
             onAddMessage={onAddMessage}
             onDeleteMessage={onDeleteMessage}
             onMoveMessage={onMoveMessage}
+            disabled={isRecording}
           />
         </div>
       </section>
@@ -95,11 +106,15 @@ const EditorPanel = ({
         <div className="mt-4">
           <PlayerControls
             isPlaying={isPlaying}
+            isRecording={isRecording}
+            elapsedMs={elapsedMs}
             visibleCount={visibleCount}
             speed={speed}
             total={messages.length}
             onPlay={onPlay}
             onPause={onPause}
+            onRecord={onRecord}
+            onStopRecording={onStopRecording}
             onReset={onReset}
             onNext={onNext}
             onPrev={onPrev}
@@ -115,6 +130,7 @@ const EditorPanel = ({
             error={importError}
             onImport={onImport}
             onLoadExample={onLoadExample}
+            disabled={isRecording}
           />
         </div>
       </section>

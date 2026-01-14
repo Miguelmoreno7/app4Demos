@@ -8,9 +8,15 @@ type JsonImportProps = {
   error: string | null;
   onImport: (value: string) => void;
   onLoadExample: () => void;
+  disabled?: boolean;
 };
 
-const JsonImport = ({ error, onImport, onLoadExample }: JsonImportProps) => {
+const JsonImport = ({
+  error,
+  onImport,
+  onLoadExample,
+  disabled = false,
+}: JsonImportProps) => {
   const [value, setValue] = useState("");
 
   return (
@@ -22,7 +28,8 @@ const JsonImport = ({ error, onImport, onLoadExample }: JsonImportProps) => {
         <button
           type="button"
           onClick={onLoadExample}
-          className="text-xs font-semibold text-emerald-600 hover:text-emerald-700"
+          disabled={disabled}
+          className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Cargar ejemplo
         </button>
@@ -31,7 +38,8 @@ const JsonImport = ({ error, onImport, onLoadExample }: JsonImportProps) => {
         value={value}
         onChange={(event) => setValue(event.target.value)}
         rows={6}
-        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+        disabled={disabled}
+        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm disabled:cursor-not-allowed disabled:bg-slate-100"
         placeholder='{"profile": {"name": "...", "avatarUrl": "..."}, "messages": []}'
       />
       {error && (
@@ -42,7 +50,8 @@ const JsonImport = ({ error, onImport, onLoadExample }: JsonImportProps) => {
       <button
         type="button"
         onClick={() => onImport(value)}
-        className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+        disabled={disabled}
+        className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
       >
         Importar
       </button>
