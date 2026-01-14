@@ -137,7 +137,7 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 px-6 py-10">
+    <div className="h-screen overflow-hidden bg-slate-100 px-6 py-10">
       <div className="mx-auto max-w-6xl">
         <header className="mb-8">
           <p className="text-sm font-semibold uppercase text-emerald-600">

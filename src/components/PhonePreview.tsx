@@ -1,9 +1,10 @@
 import { useEffect, useRef } from "react";
 import type { Message, Profile } from "../utils/storage";
 
-const backgroundStyle = {
+const chatBackgroundStyle = {
+  backgroundColor: "#efeae2",
   backgroundImage:
-    "linear-gradient(135deg, rgba(226,232,240,0.6), rgba(240,253,250,0.8)), repeating-linear-gradient(45deg, rgba(148,163,184,0.08) 0, rgba(148,163,184,0.08) 2px, transparent 2px, transparent 10px)",
+    "radial-gradient(circle at 20% 20%, rgba(255,255,255,0.35) 0, rgba(255,255,255,0.35) 20%, transparent 20%), radial-gradient(circle at 80% 0%, rgba(255,255,255,0.2) 0, rgba(255,255,255,0.2) 18%, transparent 18%), radial-gradient(circle at 0% 80%, rgba(255,255,255,0.18) 0, rgba(255,255,255,0.18) 20%, transparent 20%)",
 };
 
 type PhonePreviewProps = {
@@ -12,19 +13,22 @@ type PhonePreviewProps = {
 };
 
 const PhonePreview = ({ profile, messages }: PhonePreviewProps) => {
-  const scrollRef = useRef<HTMLDivElement | null>(null);
-  const bottomRef = useRef<HTMLDivElement | null>(null);
+  const endRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length]);
 
   return (
     <div className="flex justify-center">
-      <div className="w-full max-w-sm rounded-[2.5rem] border border-slate-200 bg-white shadow-2xl">
-        <div className="rounded-[2.3rem] border-[12px] border-slate-900/90 bg-slate-900/90">
-          <div className="rounded-[1.8rem] bg-white" style={backgroundStyle}>
-            <div className="flex items-center gap-3 border-b border-slate-200/70 bg-white/80 px-4 py-3 backdrop-blur">
+      <div className="w-full max-w-sm rounded-[3.5rem] bg-black p-4 shadow-2xl overflow-hidden">
+        <div className="flex flex-col h-[640px] rounded-[2.6rem] bg-white overflow-hidden border border-black/10">
+          <div className="relative flex justify-center bg-black">
+            <div className="h-7 w-36 rounded-b-3xl bg-black" />
+          </div>
+          <div className="flex items-center justify-between border-b border-black/5 bg-white/90 px-4 py-3">
+            <div className="flex items-center gap-3">
+              <span className="text-lg text-[#007aff]">‹</span>
               <img
                 src={profile.avatarUrl || "https://i.pravatar.cc/80?img=12"}
                 alt={profile.name}
@@ -34,15 +38,19 @@ const PhonePreview = ({ profile, messages }: PhonePreviewProps) => {
                 <p className="text-sm font-semibold text-slate-900">
                   {profile.name || "Tu nombre"}
                 </p>
-                <p className="text-xs text-slate-500">En línea</p>
+                <p className="text-xs text-slate-500">en línea</p>
               </div>
             </div>
-            <div
-              ref={scrollRef}
-              className="h-[480px] space-y-3 overflow-y-auto px-4 py-4 scrollbar-thin"
-            >
+            <div className="flex items-center gap-2 text-lg text-[#007aff]">
+              <span>📞</span>
+              <span>🎥</span>
+              <span>⋯</span>
+            </div>
+          </div>
+          <div className="flex-1 flex flex-col" style={chatBackgroundStyle}>
+            <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 space-y-3 scrollbar-thin">
               {messages.length === 0 && (
-                <div className="rounded-2xl border border-dashed border-slate-200 bg-white/70 p-4 text-center text-xs text-slate-500">
+                <div className="rounded-2xl border border-dashed border-black/10 bg-white/80 p-4 text-center text-xs text-slate-500">
                   Usa el panel para agregar mensajes y reproducir el chat.
                 </div>
               )}
@@ -54,17 +62,15 @@ const PhonePreview = ({ profile, messages }: PhonePreviewProps) => {
                   }`}
                 >
                   <div
-                    className={`max-w-[75%] rounded-2xl px-4 py-2 text-sm shadow-sm animate-fade-up ${
-                      message.from === "agent"
-                        ? "bg-emerald-100 text-emerald-900"
-                        : "bg-slate-200 text-slate-900"
+                    className={`max-w-[78%] rounded-[18px] px-4 py-2 text-sm text-slate-900 shadow-sm animate-fade-up ${
+                      message.from === "agent" ? "bg-[#dcf8c6]" : "bg-white"
                     }`}
                   >
                     {message.text || "(sin texto)"}
                   </div>
                 </div>
               ))}
-              <div ref={bottomRef} />
+              <div ref={endRef} />
             </div>
           </div>
         </div>
