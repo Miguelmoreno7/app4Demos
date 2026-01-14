@@ -48,14 +48,6 @@ export const validateImportData = (value: unknown): ValidationResult => {
     };
   }
 
-  const normalizedMessages: Message[] = record.messages.map((item) => {
-    const message = item as Message;
-    return {
-      from: message.from,
-      text: message.text.trim(),
-    };
-  });
-
   return {
     ok: true,
     data: {
@@ -63,7 +55,10 @@ export const validateImportData = (value: unknown): ValidationResult => {
         name: profile.name.trim(),
         avatarUrl: profile.avatarUrl.trim(),
       },
-      messages: normalizedMessages,
+      messages: record.messages.map((item) => ({
+        from: item.from,
+        text: item.text.trim(),
+      })),
     },
   };
 };
