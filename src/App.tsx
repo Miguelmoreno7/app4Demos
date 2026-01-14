@@ -111,10 +111,8 @@ const App = () => {
   const centerPhoneOnScreen = (element: HTMLDivElement | null) => {
     if (!element) return;
     const rect = element.getBoundingClientRect();
-    const viewportCenter = window.innerHeight / 2 - HEADER_PX;
-    const elementCenter = rect.top + rect.height / 2;
-    const delta = elementCenter - viewportCenter;
-    window.scrollTo({ top: window.scrollY + delta, behavior: "smooth" });
+    const targetTop = rect.top - HEADER_PX;
+    window.scrollTo({ top: window.scrollY + targetTop, behavior: "smooth" });
   };
 
   const handleAddMessage = useCallback(
