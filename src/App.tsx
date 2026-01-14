@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import EditorPanel from "./components/EditorPanel";
 import PhonePreview from "./components/PhonePreview";
 import {
@@ -46,6 +46,8 @@ const App = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(900);
   const [importError, setImportError] = useState<string | null>(null);
+  const phoneRef = useRef<HTMLDivElement | null>(null);
+  const previousOverflow = useRef<string>("");
 
   useEffect(() => {
     saveState({ profile, messages });
@@ -68,6 +70,30 @@ const App = () => {
     }, speed);
     return () => window.clearTimeout(timer);
   }, [isPlaying, visibleCount, messages.length, speed]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const handlePreventScroll = (event: Event) => {
+      event.preventDefault();
+    };
+
+    if (isPlaying) {
+      previousOverflow.current = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      window.addEventListener("wheel", handlePreventScroll, { passive: false });
+      window.addEventListener("touchmove", handlePreventScroll, { passive: false });
+    } else {
+      document.body.style.overflow = previousOverflow.current;
+      window.removeEventListener("wheel", handlePreventScroll);
+      window.removeEventListener("touchmove", handlePreventScroll);
+    }
+
+    return () => {
+      document.body.style.overflow = previousOverflow.current;
+      window.removeEventListener("wheel", handlePreventScroll);
+      window.removeEventListener("touchmove", handlePreventScroll);
+    };
+  }, [isPlaying]);
 
   const handleAddMessage = useCallback(
     (message: Message) => {
@@ -153,9 +179,11 @@ const App = () => {
 
         <div className="grid gap-8 lg:grid-cols-[1.1fr_1.4fr]">
           <PhonePreview
+            phoneRef={phoneRef}
             profile={profile}
             messages={messages.slice(0, visibleCount)}
             isPlaying={isPlaying}
+            visibleCount={visibleCount}
           />
           <EditorPanel
             profile={profile}
@@ -168,7 +196,13 @@ const App = () => {
             onAddMessage={handleAddMessage}
             onDeleteMessage={handleDeleteMessage}
             onMoveMessage={handleMoveMessage}
-            onPlay={() => setIsPlaying(true)}
+            onPlay={() => {
+              setIsPlaying(true);
+              phoneRef.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+              });
+            }}
             onPause={() => setIsPlaying(false)}
             onReset={handleReset}
             onNext={handleNext}

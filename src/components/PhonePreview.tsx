@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import type { Message, Profile } from "../utils/storage";
 
 const chatBackgroundStyle = {
@@ -8,23 +8,35 @@ const chatBackgroundStyle = {
 };
 
 type PhonePreviewProps = {
+  phoneRef: RefObject<HTMLDivElement>;
   profile: Profile;
   messages: Message[];
   isPlaying: boolean;
+  visibleCount: number;
 };
 
-const PhonePreview = ({ profile, messages, isPlaying }: PhonePreviewProps) => {
-  const endRef = useRef<HTMLDivElement | null>(null);
+const PhonePreview = ({
+  phoneRef,
+  profile,
+  messages,
+  isPlaying,
+  visibleCount,
+}: PhonePreviewProps) => {
+  const chatScrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!isPlaying) return;
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages.length, isPlaying]);
+    if (!chatScrollRef.current) return;
+    chatScrollRef.current.scrollTo({
+      top: chatScrollRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [visibleCount, isPlaying]);
 
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center" ref={phoneRef}>
       <div className="w-[430px] h-[932px] rounded-[3.5rem] bg-black p-4 shadow-2xl overflow-hidden">
-        <div className="flex flex-col h-full rounded-[2.6rem] bg-white overflow-hidden border border-black/10">
+        <div className="flex flex-col h-full min-h-0 rounded-[2.6rem] bg-white overflow-hidden border border-black/10">
           <div className="relative flex justify-center bg-black">
             <div className="h-7 w-36 rounded-b-3xl bg-black" />
           </div>
@@ -49,8 +61,11 @@ const PhonePreview = ({ profile, messages, isPlaying }: PhonePreviewProps) => {
               <span>⋯</span>
             </div>
           </div>
-          <div className="flex-1 flex flex-col" style={chatBackgroundStyle}>
-            <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 space-y-3 scrollbar-thin">
+          <div className="flex-1 flex min-h-0 flex-col" style={chatBackgroundStyle}>
+            <div
+              ref={chatScrollRef}
+              className="flex-1 h-full overflow-y-auto overscroll-contain px-4 py-4 space-y-3 scrollbar-thin"
+            >
               {messages.length === 0 && (
                 <div className="rounded-2xl border border-dashed border-black/10 bg-white/80 p-4 text-center text-xs text-slate-500">
                   Usa el panel para agregar mensajes y reproducir el chat.
@@ -72,7 +87,6 @@ const PhonePreview = ({ profile, messages, isPlaying }: PhonePreviewProps) => {
                   </div>
                 </div>
               ))}
-              <div ref={endRef} />
             </div>
           </div>
         </div>
