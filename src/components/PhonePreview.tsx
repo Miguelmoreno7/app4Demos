@@ -10,19 +10,21 @@ const chatBackgroundStyle = {
 type PhonePreviewProps = {
   profile: Profile;
   messages: Message[];
+  isPlaying: boolean;
 };
 
-const PhonePreview = ({ profile, messages }: PhonePreviewProps) => {
+const PhonePreview = ({ profile, messages, isPlaying }: PhonePreviewProps) => {
   const endRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    if (!isPlaying) return;
     endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages.length]);
+  }, [messages.length, isPlaying]);
 
   return (
     <div className="flex justify-center">
-      <div className="w-full max-w-sm rounded-[3.5rem] bg-black p-4 shadow-2xl overflow-hidden">
-        <div className="flex flex-col h-[640px] rounded-[2.6rem] bg-white overflow-hidden border border-black/10">
+      <div className="w-[430px] h-[932px] rounded-[3.5rem] bg-black p-4 shadow-2xl overflow-hidden">
+        <div className="flex flex-col h-full rounded-[2.6rem] bg-white overflow-hidden border border-black/10">
           <div className="relative flex justify-center bg-black">
             <div className="h-7 w-36 rounded-b-3xl bg-black" />
           </div>

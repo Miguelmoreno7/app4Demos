@@ -137,7 +137,7 @@ const App = () => {
   };
 
   return (
-    <div className="h-screen overflow-hidden bg-slate-100 px-6 py-10">
+    <div className="min-h-screen bg-slate-100 px-6 py-10">
       <div className="mx-auto max-w-6xl">
         <header className="mb-8">
           <p className="text-sm font-semibold uppercase text-emerald-600">
@@ -152,7 +152,11 @@ const App = () => {
         </header>
 
         <div className="grid gap-8 lg:grid-cols-[1.1fr_1.4fr]">
-          <PhonePreview profile={profile} messages={messages.slice(0, visibleCount)} />
+          <PhonePreview
+            profile={profile}
+            messages={messages.slice(0, visibleCount)}
+            isPlaying={isPlaying}
+          />
           <EditorPanel
             profile={profile}
             messages={messages}
