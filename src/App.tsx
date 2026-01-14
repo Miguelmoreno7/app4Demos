@@ -48,6 +48,9 @@ const App = () => {
   const [importError, setImportError] = useState<string | null>(null);
   const phoneRef = useRef<HTMLDivElement | null>(null);
   const previousOverflow = useRef<string>("");
+  const [isScrollLocked, setIsScrollLocked] = useState(false);
+  const lockTimerRef = useRef<number | null>(null);
+  const HEADER_PX = 0;
 
   useEffect(() => {
     saveState({ profile, messages });
@@ -63,6 +66,7 @@ const App = () => {
     if (!isPlaying) return;
     if (visibleCount >= messages.length) {
       setIsPlaying(false);
+      setIsScrollLocked(false);
       return;
     }
     const timer = window.setTimeout(() => {
@@ -77,7 +81,7 @@ const App = () => {
       event.preventDefault();
     };
 
-    if (isPlaying) {
+    if (isScrollLocked) {
       previousOverflow.current = document.body.style.overflow;
       document.body.style.overflow = "hidden";
       window.addEventListener("wheel", handlePreventScroll, { passive: false });
@@ -93,7 +97,25 @@ const App = () => {
       window.removeEventListener("wheel", handlePreventScroll);
       window.removeEventListener("touchmove", handlePreventScroll);
     };
+  }, [isScrollLocked]);
+
+  useEffect(() => {
+    if (isPlaying) return;
+    if (lockTimerRef.current) {
+      window.clearTimeout(lockTimerRef.current);
+      lockTimerRef.current = null;
+    }
+    setIsScrollLocked(false);
   }, [isPlaying]);
+
+  const centerPhoneOnScreen = (element: HTMLDivElement | null) => {
+    if (!element) return;
+    const rect = element.getBoundingClientRect();
+    const viewportCenter = window.innerHeight / 2 - HEADER_PX;
+    const elementCenter = rect.top + rect.height / 2;
+    const delta = elementCenter - viewportCenter;
+    window.scrollTo({ top: window.scrollY + delta, behavior: "smooth" });
+  };
 
   const handleAddMessage = useCallback(
     (message: Message) => {
@@ -197,13 +219,19 @@ const App = () => {
             onDeleteMessage={handleDeleteMessage}
             onMoveMessage={handleMoveMessage}
             onPlay={() => {
+              centerPhoneOnScreen(phoneRef.current);
               setIsPlaying(true);
-              phoneRef.current?.scrollIntoView({
-                behavior: "smooth",
-                block: "center",
-              });
+              if (lockTimerRef.current) {
+                window.clearTimeout(lockTimerRef.current);
+              }
+              lockTimerRef.current = window.setTimeout(() => {
+                setIsScrollLocked(true);
+              }, 200);
             }}
-            onPause={() => setIsPlaying(false)}
+            onPause={() => {
+              setIsPlaying(false);
+              setIsScrollLocked(false);
+            }}
             onReset={handleReset}
             onNext={handleNext}
             onPrev={handlePrev}
